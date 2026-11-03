@@ -5,7 +5,7 @@
   "main": "dist/gateway.js",
   "scripts": {
     "build": "tsc",
-    "test": "node --test dist/tests",
+    "test": "node --test \"dist/tests/*.js\"",
     "benchmark": "node dist/benchmark/gateway-benchmark.js && node dist/benchmark/stress-benchmark.js",
     "start": "node dist/src/gateway.js"
   },

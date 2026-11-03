@@ -12,7 +12,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { CanaryRouter } from '../src/proxy/canary-router.js';
-import { EWMABalancer } from '../src/balancer/strategies.js';
+import { EWMALatencyBalancer } from '../src/balancer/strategies.js';
 
 describe('Canary Router Statistical Traffic Splitting', () => {
   it('splits traffic across 2,000 unique client IPs matching 20% weight within 2% margin', () => {
@@ -65,10 +65,12 @@ describe('Canary Router Statistical Traffic Splitting', () => {
 
 describe('EWMA Adaptive Latency Balancer', () => {
   it('dynamically diverts traffic away from degraded high-latency upstreams', () => {
-    const balancer = new EWMABalancer([
-      { id: 'node-fast', url: 'http://10.0.1.1:8080', weight: 1, activeConnections: 2, latencyEwmaMs: 2.1, isHealthy: true },
-      { id: 'node-slow', url: 'http://10.0.1.2:8080', weight: 1, activeConnections: 2, latencyEwmaMs: 85.4, isHealthy: true },
+    const balancer = new EWMALatencyBalancer([
+      { id: 'node-fast', url: 'http://10.0.1.1:8080', weight: 1, activeConnections: 2, isHealthy: true, consecutiveFailures: 0 },
+      { id: 'node-slow', url: 'http://10.0.1.2:8080', weight: 1, activeConnections: 2, isHealthy: true, consecutiveFailures: 0 },
     ]);
+    balancer.recordLatency('http://10.0.1.1:8080', 2.1);
+    balancer.recordLatency('http://10.0.1.2:8080', 85.4);
 
     // Balancer must prioritize low EWMA latency node
     const chosen = balancer.getNext();

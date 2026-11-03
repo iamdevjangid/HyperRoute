@@ -32,7 +32,7 @@ describe('High-Throughput Concurrency & Load Stress Tests', () => {
       const t1 = performance.now();
       latencies.push(t1 - t0);
 
-      if (res.allowed) {
+      if (res) {
         allowedCount++;
       } else {
         rejectedCount++;
@@ -59,19 +59,19 @@ describe('High-Throughput Concurrency & Load Stress Tests', () => {
     // Burst consume all 50 tokens
     for (let i = 0; i < 50; i++) {
       const res = bucket.consume(clientKey, 1, initialTime);
-      assert.strictEqual(res.allowed, true);
+      assert.strictEqual(res, true);
     }
 
     // 51st request must be denied
     const overflow = bucket.consume(clientKey, 1, initialTime);
-    assert.strictEqual(overflow.allowed, false);
+    assert.strictEqual(overflow, false);
 
     // Advance clock by 2.0 seconds -> 20 tokens refilled
     const afterRefill = bucket.consume(clientKey, 15, initialTime + 2000);
-    assert.strictEqual(afterRefill.allowed, true);
+    assert.strictEqual(afterRefill, true);
 
     // Remaining tokens should be ~5
     const remainder = bucket.consume(clientKey, 10, initialTime + 2000);
-    assert.strictEqual(remainder.allowed, false, 'Consuming more than remaining tokens must be rejected');
+    assert.strictEqual(remainder, false, 'Consuming more than remaining tokens must be rejected');
   });
 });

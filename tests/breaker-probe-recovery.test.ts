@@ -16,7 +16,7 @@ import { CircuitBreakerFallbackInterceptor } from '../src/middleware/fallback.js
 
 describe('Circuit Breaker Half-Open Recovery & Multi-Route Isolation', () => {
   it('allows single half-open trial request after cooldown and closes circuit on recovery', async () => {
-    let mockTime = 1000000;
+    let mockTime = Date.now();
     const interceptor = new CircuitBreakerFallbackInterceptor({
       tripThreshold: 2,
       cooloffMs: 3000,
